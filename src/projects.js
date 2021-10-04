@@ -1,8 +1,12 @@
 // Holds a list of projects
 const projectContainer = document.querySelector(".project-container");
 
-const allProjectsModule = (()=>{
+const allProjectsModule = (() => {
   let _projects = [];
+
+  // Project highlighted in the main console and the
+  // one that the user wants to view
+  let _currentProjectHighlighted = 0;
 
   function getProject(id){
     return _projects[id];
@@ -17,6 +21,7 @@ const allProjectsModule = (()=>{
     const newProject = {
       id : id,
       projectName : name,
+      tasks : []
     }
 
     _projects.push(newProject);
@@ -30,10 +35,19 @@ const allProjectsModule = (()=>{
     _projects.splice(id, 1);
   }
 
+  /**
+   * Sets the current project in view of the user
+   * @param {*} id The id of the project selected
+   */
+  function setCurrentProjectHighlighted(id) {
+    _currentProjectHighlighted = id;
+  }
+
   return {
     getProject,
     addProjects,
-    deleteProject
+    deleteProject,
+    setCurrentProjectHighlighted
   }
 
 })();

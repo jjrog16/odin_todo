@@ -14,7 +14,7 @@ body {
 
 /* Projects */
 
-.add-project {
+.add-item {
   color: white;
   background-color: red;
   height: 32x;
@@ -25,7 +25,7 @@ body {
   user-select: none;
 }
 
-.add-project:hover {
+.add-item:hover {
   background-color: white;
   color: black;
   cursor: pointer;
@@ -73,6 +73,20 @@ body {
 
 
 /* Tasks */
-.todo-container {
+.main-container {
   padding: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.task-container {
+  display: flex;
+}
+
+.main-bottom {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
 }

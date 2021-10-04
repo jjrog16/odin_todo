@@ -1,14 +1,20 @@
 import "./style.css";
 import { Project, allProjectsModule } from "./projects";
+import { Task } from "./tasks";
 
-console.log("hello world!");
-
-const btnAddProject = document.querySelector(".add-project");
+const btnAddProject = document.querySelector(".sidebar .add-item");
 btnAddProject.addEventListener("click",createNewProject)
 
+const btnAddTask = document.querySelector(".main-bottom .add-item");
+btnAddTask.addEventListener("click", createNewTask);
 
 function createNewProject() {
-  console.log("Button clicked");
+  console.log("New Project clicked");
   let createdProject = new Project;
   createdProject.createProject();
+}
+
+function createNewTask() {
+  console.log("New Task clicked");
+  let createdTask = new Task
 }
