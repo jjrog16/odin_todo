@@ -40,8 +40,15 @@ body {
   align-items: center;
 }
 
-.project-delete {
+.delete-project {
   font-size: 16px;
+  padding: 8px;
+}
+
+.delete-project:hover {
+  background-color: white;
+  color: black;
+  cursor: pointer;
 }
 
 .sidebar {
