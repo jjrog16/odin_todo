@@ -8,8 +8,21 @@ const allProjectsModule = (() => {
   // one that the user wants to view
   let _currentProjectHighlighted = 0;
 
-  function getProject(id){
-    return _projects[id];
+  /**
+   * Gets a specific project
+   * @param {*} id ID of project 
+   * @returns 
+   */
+  function getProjectName(id){
+    return _projects[id].projectName;
+  }
+
+  /**
+   * Gets all items in projects
+   * @returns All contents of projects
+   */
+  function getAllProjects() {
+    return _projects;
   }
 
   /**
@@ -28,6 +41,15 @@ const allProjectsModule = (() => {
   }
 
   /**
+   * Update or Insert task into project array
+   * @param {*} id 
+   * @param {*} task 
+   */
+  function upsert(id, task) {
+    _projects[id].tasks.push(task);
+  }
+
+  /**
    * Removes project from array
    * @param {*} id Project id to be removed
    */
@@ -43,14 +65,43 @@ const allProjectsModule = (() => {
     _currentProjectHighlighted = id;
   }
 
+  function getCurrentProjectHighlighted() {
+    return _currentProjectHighlighted;
+  }
+
   return {
-    getProject,
+    getProjectName,
     addProjects,
     deleteProject,
-    setCurrentProjectHighlighted
+    setCurrentProjectHighlighted,
+    getCurrentProjectHighlighted
   }
 
 })();
+
+// const displayControllerModule = (() => {
+  
+//   function selectProject(id) {
+//     let selected = document.getElementById(id);
+//     selected.addEventListener("click", (() => {
+//       // I am selecting a different item than what is currently highlighted
+//       if(allProjectsModule.getCurrentProjectHighlighted != id) {
+//         let previouslySelected = document.querySelector(`#${allProjectsModule.getCurrentProjectHighlighted()}`);
+//         previouslySelected.style.backgroundColor = "black";
+//         previouslySelected.style.color = "white";
+//       }
+//       allProjectsModule.setCurrentProjectHighlighted(id);
+//       selected.style.backgroundColor = "white";
+//       selected.style.color = "black";
+//     }))
+ 
+//   }
+
+//   return {
+//     selectProject
+//   }
+
+// })();
 
 class Project {
   project = {};
@@ -88,12 +139,22 @@ class Project {
         this.deleteProject(this.project.id)
     }));
 
-    this.saveProject(this.project.id, this.project.name, this.project.tasks)
+    this.saveProject(this.project.id, this.project.name);
 
     newProject.addEventListener("click", (() => {
-      allProjectsModule.getProject(this.project.id);
+      // Check to see the value is of a truely highlighted project
+      let isValidProjectHighlighted = allProjectsModule.getCurrentProjectHighlighted() != 0;
+      console.log(allProjectsModule.getCurrentProjectHighlighted());
+      // I am selecting a different item than what is currently highlighted
+      if(isValidProjectHighlighted && allProjectsModule.getCurrentProjectHighlighted != this.project.id) {
+        let previouslySelected = document.getElementById(allProjectsModule.getCurrentProjectHighlighted());
+        previouslySelected.style.backgroundColor = "black";
+        previouslySelected.style.color = "white";
+      }
+      allProjectsModule.setCurrentProjectHighlighted(this.project.id);
+      newProject.style.backgroundColor = "white";
+      newProject.style.color = "black";
     }))
-
     newProject.appendChild(projectName);
     newProject.appendChild(btnDeleteProject);
 

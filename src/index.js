@@ -1,6 +1,8 @@
 import "./style.css";
-import { Project, allProjectsModule } from "./projects";
+import { Project } from "./projects";
 import { Task } from "./tasks";
+
+const projectContainer = document.querySelector(".project-container");
 
 const btnAddProject = document.querySelector(".sidebar .add-item");
 btnAddProject.addEventListener("click",createNewProject)
@@ -16,6 +18,10 @@ function createNewProject() {
 
 function createNewTask() {
   console.log("New Task clicked");
-  let createdTask = new Task;
-  createdTask.createTask();
+
+  // Only add a task if there is a project
+  if(projectContainer.childNodes.length > 0) {
+    let createdTask = new Task;
+    createdTask.createTask();
+  }
 }

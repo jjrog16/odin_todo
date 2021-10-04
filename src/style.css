@@ -99,7 +99,7 @@ body {
   border: 1px solid #eee;
   box-shadow: 2px 4px 16px rgba(0,0,0,.06);
   border-radius: 4px;
-  width: 300px;
+  width: 400px;
   display: flex;
   padding: 32px;
   margin: 32px;
@@ -108,6 +108,7 @@ body {
 .task-top {
   display: flex;
   justify-content: space-between;
+  padding: 16px;
 }
 
 .task-left {
@@ -120,6 +121,7 @@ body {
 .task-bottom {
   display: flex;
   justify-content: center;
+  padding: 16px;
 }
 
 .task-holder {

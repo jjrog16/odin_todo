@@ -33,9 +33,9 @@ class Task {
     let divTaskLeft = document.createElement("div");
     divTaskLeft.setAttribute("class", "task-left");
 
-    // radio button
+    // checkbox button
     let btnCleared = document.createElement("input");
-    btnCleared.setAttribute("type", "radio");
+    btnCleared.setAttribute("type", "checkbox");
     btnCleared.setAttribute("class", "radio-button");
 
     // Task contents
@@ -51,15 +51,15 @@ class Task {
     divTaskTop.setAttribute("class", "task-top");
 
     // Task name
-    let divTaskName = document.createElement("div");
-    divTaskName.setAttribute("class", "task-name");
-    divTaskName.appendChild(document.createTextNode("New Task"))
+    let inputTaskName = document.createElement("input");
+    inputTaskName.setAttribute("class", "task-name");
+    inputTaskName.setAttribute("id", this.id);
+    inputTaskName.addEventListener("change", this.updateTask);
 
     // Task Date
     let divTaskDate = document.createElement("div");
     divTaskDate.setAttribute("class", "task-date");
-    divTaskDate.appendChild(document.createTextNode("New Date"))
-
+    divTaskDate.appendChild(document.createTextNode(`${this.date.toLocaleDateString("en-US")}`));
 
     // Task bottom
     let divTaskBottom = document.createElement("div");
@@ -73,7 +73,7 @@ class Task {
     // Append to parents
     divTaskLeft.appendChild(btnCleared);
 
-    divTaskTop.appendChild(divTaskName);
+    divTaskTop.appendChild(inputTaskName);
     divTaskTop.appendChild(divTaskDate);
 
     divTaskBottom.appendChild(btnDeleteTask);
@@ -86,6 +86,16 @@ class Task {
 
     taskContainer.appendChild(divTaskContents);
 
+
+  }
+
+  updateTask(e) {
+    // Take the change event (adding a new name value) and update the name of the task
+    this.taskName = e.target.value;
+    let currProjectId = allProjectsModule.getCurrentProjectHighlighted();
+    allProjectsModule.addProjects( )
+    console.log(`Task ID: ${this.id} Task Name: ${this.taskName} Task Date: ${this.date}`);
+    console.log(`Current highlighted project: ${currProjectId}`);
   }
 }
 
