@@ -12,13 +12,11 @@ const allProjectsModule = (()=>{
    * Adds project object to project array
    * @param {*} id Project id of new project
    * @param {*} name Name of the project
-   * @param {*} tasks Object containing individual tasks
    */
-  function addProjects(id, name, tasks) {
+  function addProjects(id, name) {
     const newProject = {
       id : id,
       projectName : name,
-      tasks : tasks
     }
 
     _projects.push(newProject);
@@ -56,7 +54,6 @@ class Project {
 
     this.project.id = this.projectCounter;
     this.project.name = `Project ${this.projectCounter}`;
-    this.project.tasks = {};
   }
   
   createProject(){
@@ -90,8 +87,8 @@ class Project {
     projectContainer.appendChild(newProject);
   }
 
-  saveProject(id, name, tasks) {
-    allProjectsModule.addProjects(id, name, tasks);
+  saveProject(id, name) {
+    allProjectsModule.addProjects(id, name);
   }
 
   deleteProject(id) {
