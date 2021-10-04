@@ -16,5 +16,6 @@ function createNewProject() {
 
 function createNewTask() {
   console.log("New Task clicked");
-  let createdTask = new Task
+  let createdTask = new Task;
+  createdTask.createTask();
 }

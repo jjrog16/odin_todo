@@ -78,10 +78,14 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  width: 800px;
 }
 
 .task-container {
   display: flex;
+  flex-flow: column wrap;
+  justify-content: center;
+  align-items: center;
 }
 
 .main-bottom {
@@ -89,4 +93,35 @@ body {
   justify-content: center;
   align-items: center;
 
+}
+
+.task-contents {
+  border: 1px solid #eee;
+  box-shadow: 2px 4px 16px rgba(0,0,0,.06);
+  border-radius: 4px;
+  width: 300px;
+  display: flex;
+  padding: 32px;
+  margin: 32px;
+}
+
+.task-top {
+  display: flex;
+  justify-content: space-between;
+}
+
+.task-left {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 8px;
+}
+
+.task-bottom {
+  display: flex;
+  justify-content: center;
+}
+
+.task-holder {
+  width: 400px;
 }
