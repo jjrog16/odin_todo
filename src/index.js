@@ -1,6 +1,6 @@
 import "./style.css";
-import { Project } from "./projects";
-import { Task } from "./tasks";
+import { Project, allProjectsModule } from "./projects";
+import { Task, taskDisplayModule } from "./tasks";
 
 const projectContainer = document.querySelector(".project-container");
 
@@ -12,16 +12,19 @@ btnAddTask.addEventListener("click", createNewTask);
 
 function createNewProject() {
   console.log("New Project clicked");
-  let createdProject = new Project;
-  createdProject.createProject();
+  let project = new Project;
+  project.init();
 }
+
+taskDisplayModule.initRemovableTaskContainer();
 
 function createNewTask() {
   console.log("New Task clicked");
 
   // Only add a task if there is a project
-  if(projectContainer.childNodes.length > 0) {
+  if(projectContainer.childNodes.length > 0 & allProjectsModule.getIsHighlightedStatus()) {
+    console.log(`Status after delete -> ${allProjectsModule.getIsHighlightedStatus()}`)
     let createdTask = new Task;
-    createdTask.createTask();
+    createdTask.init();
   }
 }

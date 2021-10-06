@@ -1,29 +1,29 @@
+import { Task, taskDisplayModule } from "./tasks";
+
 // Holds a list of projects
 const projectContainer = document.querySelector(".project-container");
 
 const allProjectsModule = (() => {
   let _projects = [];
 
+  // TODO: Debug where values are being saved for tasks
+  let testTask = {
+    id: 1,
+    taskName: "Bother Jess"
+  }
+
+  let testProject = {
+    id: 69,
+    projectName: "Project 69",
+    tasks: [testTask]
+  }
+
+  _projects.push(testProject)
+
   // Project highlighted in the main console and the
   // one that the user wants to view
   let _currentProjectHighlighted = 0;
-
-  /**
-   * Gets a specific project
-   * @param {*} id ID of project 
-   * @returns 
-   */
-  function getProjectName(id){
-    return _projects[id].projectName;
-  }
-
-  /**
-   * Gets all items in projects
-   * @returns All contents of projects
-   */
-  function getAllProjects() {
-    return _projects;
-  }
+  let _isHighlighted = false;
 
   /**
    * Adds project object to project array
@@ -41,20 +41,20 @@ const allProjectsModule = (() => {
   }
 
   /**
-   * Update or Insert task into project array
-   * @param {*} id 
-   * @param {*} task 
-   */
-  function upsert(id, task) {
-    _projects[id].tasks.push(task);
-  }
-
-  /**
    * Removes project from array
    * @param {*} id Project id to be removed
    */
   function deleteProject(id) {
     _projects.splice(id, 1);
+  }
+
+  function getProject(id) {
+    let projectRetrieved = _projects.find(project => project.id == id);
+    return projectRetrieved
+  }
+
+  function getCurrentProjectHighlighted() {
+    return _currentProjectHighlighted;
   }
 
   /**
@@ -65,43 +65,146 @@ const allProjectsModule = (() => {
     _currentProjectHighlighted = id;
   }
 
-  function getCurrentProjectHighlighted() {
-    return _currentProjectHighlighted;
+  function getIsHighlightedStatus() {
+    return _isHighlighted;
+  }
+
+  function setIsHighlightedStatus(status) {
+    _isHighlighted = status;
   }
 
   return {
-    getProjectName,
     addProjects,
     deleteProject,
     setCurrentProjectHighlighted,
-    getCurrentProjectHighlighted
+    getCurrentProjectHighlighted,
+    getIsHighlightedStatus,
+    setIsHighlightedStatus,
+    getProject
+  }
+})();
+
+const projectDisplayControllerModule = (() => {
+
+  let rememberLastSelected;
+
+  /**
+   * Highlights the project in the project sidebar and deselects other projects.
+   * @param {*} project The project being selected
+   */
+  function _selectProject(project, projectId) {
+
+    // Check to see if the value has been assigned yet. if not, then immediately assign.
+    if(allProjectsModule.getCurrentProjectHighlighted() == 0) {
+      allProjectsModule.setCurrentProjectHighlighted(projectId);
+      allProjectsModule.setIsHighlightedStatus(false);
+    }
+    
+    // I am selecting a different item than what is currently highlighted
+    if(allProjectsModule.getCurrentProjectHighlighted != projectId) {
+
+      let previouslySelected = document.getElementById(`project${allProjectsModule.getCurrentProjectHighlighted()}`);
+
+      // Check to see if you have a property. If you do then change it
+      if(previouslySelected != null) {
+        previouslySelected.style.backgroundColor = "black";
+        previouslySelected.style.color = "white";
+        rememberLastSelected = previouslySelected ;
+      }
+      
+    }
+
+    allProjectsModule.setCurrentProjectHighlighted(projectId);
+    project.style.backgroundColor = "white";
+    project.style.color = "black";
+    allProjectsModule.setIsHighlightedStatus(true);
+  }
+
+  /**
+   * Deletes project from allProjectModule and removes it from the UI
+   * @param {*} id 
+   */
+  function _deleteProject(id) {
+
+    console.log(`Status before delete -> ${allProjectsModule.getIsHighlightedStatus()}`)
+
+    // Remove the project from all projects
+    allProjectsModule.deleteProject(id);
+
+    // Remove project from the view
+    document.getElementById(`project${id}`).remove();
+
+    allProjectsModule.setIsHighlightedStatus(false);
+
+    console.log(`Status after delete -> ${allProjectsModule.getIsHighlightedStatus()}`);
+
+  }
+
+  /**
+   * Creates an individual entry for a Project
+   */
+  function createProjectView(projectId) {
+    // Create individual projects
+    let newProject = document.createElement("div");
+    newProject.setAttribute("class", "project-item");
+    newProject.setAttribute("id", `project${projectId}`);
+
+    // Name of each project being added to the list
+    let projectName = document.createTextNode(`Project ${projectId}`);
+    
+    newProject.addEventListener("click", (() => {
+      // Select the project you just clicked
+      _selectProject(newProject, projectId);
+
+      // Get the list of tasks of that project
+      let tasksToLoad = allProjectsModule.getProject(projectId)
+
+      // Clear the screen of the previous tasks
+      taskDisplayModule.clearTaskScreen();
+
+      // Load the objects with the contents of the old tasks
+      for(task in tasksToLoad.tasks) {
+        let loadedTask = new Task(task.id, task.taskName);
+        loadedTask.init();
+        console.log(`Task ${tasksToLoad} loaded`);
+      }
+      
+      
+      console.log(`Project ${projectId} clicked`)
+    }))
+    
+    newProject.appendChild(projectName);
+
+    // Button to delete project
+    let btnDeleteProject = document.createElement("div");
+    btnDeleteProject.setAttribute("class", "delete-project");
+    btnDeleteProject.appendChild(document.createTextNode("x"));
+
+    btnDeleteProject.addEventListener("click", (() => {
+        _deleteProject(projectId);
+    }));
+
+    newProject.appendChild(btnDeleteProject);
+
+    // Set the content
+    projectContainer.appendChild(newProject);
+  }
+  
+  /**
+   * Saves the project to the allProjectsModule so all projects are stored
+   * @param {*} id ID of the project made
+   * @param {*} name Name of the project
+   */
+  function saveProject(id, name) {
+    allProjectsModule.addProjects(id, name);
+  }
+  
+  return {
+    createProjectView,
+    saveProject
   }
 
 })();
-
-// const displayControllerModule = (() => {
-  
-//   function selectProject(id) {
-//     let selected = document.getElementById(id);
-//     selected.addEventListener("click", (() => {
-//       // I am selecting a different item than what is currently highlighted
-//       if(allProjectsModule.getCurrentProjectHighlighted != id) {
-//         let previouslySelected = document.querySelector(`#${allProjectsModule.getCurrentProjectHighlighted()}`);
-//         previouslySelected.style.backgroundColor = "black";
-//         previouslySelected.style.color = "white";
-//       }
-//       allProjectsModule.setCurrentProjectHighlighted(id);
-//       selected.style.backgroundColor = "white";
-//       selected.style.color = "black";
-//     }))
- 
-//   }
-
-//   return {
-//     selectProject
-//   }
-
-// })();
 
 class Project {
   project = {};
@@ -120,57 +223,12 @@ class Project {
     this.project.id = this.projectCounter;
     this.project.name = `Project ${this.projectCounter}`;
   }
-  
-  createProject(){
-    // Create individual items
-    let newProject = document.createElement("div");
-    newProject.setAttribute("class", "project-item");
-    newProject.setAttribute("id", `${this.projectCounter}`);
 
-    // Name of each project being added to the list
-    let projectName = document.createTextNode(`Project ${this.projectCounter}`);
-
-    // Button to delete project
-    let btnDeleteProject = document.createElement("div");
-    btnDeleteProject.setAttribute("class", "delete-project");
-    btnDeleteProject.appendChild(document.createTextNode("x"));
-
-    btnDeleteProject.addEventListener("click", (() => {
-        this.deleteProject(this.project.id)
-    }));
-
-    this.saveProject(this.project.id, this.project.name);
-
-    newProject.addEventListener("click", (() => {
-      // Check to see the value is of a truely highlighted project
-      let isValidProjectHighlighted = allProjectsModule.getCurrentProjectHighlighted() != 0;
-      console.log(allProjectsModule.getCurrentProjectHighlighted());
-      // I am selecting a different item than what is currently highlighted
-      if(isValidProjectHighlighted && allProjectsModule.getCurrentProjectHighlighted != this.project.id) {
-        let previouslySelected = document.getElementById(allProjectsModule.getCurrentProjectHighlighted());
-        previouslySelected.style.backgroundColor = "black";
-        previouslySelected.style.color = "white";
-      }
-      allProjectsModule.setCurrentProjectHighlighted(this.project.id);
-      newProject.style.backgroundColor = "white";
-      newProject.style.color = "black";
-    }))
-    newProject.appendChild(projectName);
-    newProject.appendChild(btnDeleteProject);
-
-    // Set the content
-    projectContainer.appendChild(newProject);
+  init() {
+    projectDisplayControllerModule.createProjectView(this.project.id);
+    projectDisplayControllerModule.saveProject(this.project.id, this.project.name);
   }
 
-  saveProject(id, name) {
-    allProjectsModule.addProjects(id, name);
-  }
-
-  deleteProject(id) {
-    allProjectsModule.deleteProject(id);
-    document.getElementById(id).remove();
-    console.log(`Project ${id} deleted`)
-  }
 }
 
 export {

@@ -2,29 +2,11 @@ import { Project, allProjectsModule } from "./projects";
 
 const taskContainer = document.querySelector(".task-container");
 
-const tasksModule = (() =>{ 
-  let _tasks = [];
+let removableTaskContainer;
 
-
-})();
-
-class Task {
-
-  // The static property
-  static #lastCount = 0;
-
-  // The instance property using the class fields proposal syntax
-  // Note I didn't initialize it with 1, that's a bit misleading.
-  taskCounter;
-
-  constructor() {
-    this.taskCounter = ++Task.#lastCount;
-    this.id = this.taskCounter;
-    this.taskName;
-    this.date = new Date;
-  }
-
-  createTask() {
+const taskDisplayModule = (() =>{ 
+  
+  function createTaskView(id, taskName, date) {
     // Create individual item
     let taskItem = document.createElement("div");
     taskItem.setAttribute("class", "task-item");
@@ -53,13 +35,13 @@ class Task {
     // Task name
     let inputTaskName = document.createElement("input");
     inputTaskName.setAttribute("class", "task-name");
-    inputTaskName.setAttribute("id", this.id);
-    inputTaskName.addEventListener("change", this.updateTask);
+    inputTaskName.setAttribute("id", `task${id}`);
+    inputTaskName.addEventListener("change", updateTask);
 
-    // Task Date
-    let divTaskDate = document.createElement("div");
-    divTaskDate.setAttribute("class", "task-date");
-    divTaskDate.appendChild(document.createTextNode(`${this.date.toLocaleDateString("en-US")}`));
+    // // Task Date
+    // let divTaskDate = document.createElement("div");
+    // divTaskDate.setAttribute("class", "task-date");
+    // divTaskDate.appendChild(document.createTextNode(`${date.toLocaleDateString("en-US")}`));
 
     // Task bottom
     let divTaskBottom = document.createElement("div");
@@ -74,7 +56,7 @@ class Task {
     divTaskLeft.appendChild(btnCleared);
 
     divTaskTop.appendChild(inputTaskName);
-    divTaskTop.appendChild(divTaskDate);
+    // divTaskTop.appendChild(divTaskDate);
 
     divTaskBottom.appendChild(btnDeleteTask);
 
@@ -84,21 +66,67 @@ class Task {
     divTaskContents.appendChild(divTaskLeft);
     divTaskContents.appendChild(divTaskHolder);
 
-    taskContainer.appendChild(divTaskContents);
-
-
+    removableTaskContainer.appendChild(divTaskContents);
+    taskContainer.appendChild(removableTaskContainer);
+    //taskContainer.appendChild(divTaskContents);
   }
 
-  updateTask(e) {
+  function initRemovableTaskContainer() {
+    removableTaskContainer = document.createElement("div");
+    removableTaskContainer.setAttribute("class", "removable");
+  }
+
+  function clearTaskScreen() {
+    let removable = document.querySelector(".removable");
+    if(removable) {
+      removable.remove();
+    }
+  }
+
+  function updateTask(e) {
     // Take the change event (adding a new name value) and update the name of the task
-    this.taskName = e.target.value;
-    let currProjectId = allProjectsModule.getCurrentProjectHighlighted();
-    allProjectsModule.addProjects( )
-    console.log(`Task ID: ${this.id} Task Name: ${this.taskName} Task Date: ${this.date}`);
-    console.log(`Current highlighted project: ${currProjectId}`);
+    let updatedName = e.target.value;
+
+    console.log(updatedName)
   }
+
+  return {
+    createTaskView,
+    clearTaskScreen,
+    initRemovableTaskContainer
+  }
+
+
+})();
+
+class Task {
+
+  // The static property
+  static #lastCount = 0;
+
+  // The instance property using the class fields proposal syntax
+  // Note I didn't initialize it with 1, that's a bit misleading.
+  taskCounter;
+
+  constructor(passedId = null, passedName = null) {
+    if(passedId == null) {
+      this.taskCounter = ++Task.#lastCount;
+      this.id = this.taskCounter;
+      this.taskName = "";
+    } else {
+      this.id = passedId;
+      this.taskName = passedName;
+    }
+    
+  }
+
+  init() {
+    taskDisplayModule.createTaskView(this.id, this.taskName);
+  }
+
 }
 
 export {
-  Task
+  Task,
+  taskDisplayModule
 }
