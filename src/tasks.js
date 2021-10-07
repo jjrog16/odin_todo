@@ -1,8 +1,8 @@
-const taskContainer = document.querySelector(".task-container");
-
-let removableTaskContainer;
 
 const taskDisplayModule = (() =>{ 
+  const taskContainer = document.querySelector(".task-container");
+
+  let removableTaskContainer;
   
   function createTaskView(id, taskName, date) {
     // Create individual item
@@ -34,6 +34,7 @@ const taskDisplayModule = (() =>{
     let inputTaskName = document.createElement("input");
     inputTaskName.setAttribute("class", "task-name");
     inputTaskName.setAttribute("id", `task${id}`);
+    // Save the new edited name to its project
     inputTaskName.addEventListener("change", updateTask);
 
     // // Task Date
@@ -81,6 +82,10 @@ const taskDisplayModule = (() =>{
     }
   }
 
+  /**
+   * Update the task name associated to a project
+   * @param {*} e input field event change
+   */
   function updateTask(e) {
     // Take the change event (adding a new name value) and update the name of the task
     let updatedName = e.target.value;

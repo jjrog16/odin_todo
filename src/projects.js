@@ -1,7 +1,4 @@
-import { Task, taskDisplayModule } from "./tasks";
-
-// Holds a list of projects
-const projectContainer = document.querySelector(".project-container");
+import { taskDisplayModule } from "./tasks";
 
 const allProjectsModule = (() => {
   let _projects = [];
@@ -20,7 +17,7 @@ const allProjectsModule = (() => {
    * Adds project object to project array
    * @param {*} projectToSave Project being saved to allProjectsModule
    */
-  function saveProjects(projectToSave) {
+  function saveProject(projectToSave) {
     _projects.push(projectToSave);
   }
 
@@ -32,14 +29,26 @@ const allProjectsModule = (() => {
     _projects.splice(id, 1);
   }
 
+  /**
+   * Get the number of how many projects exists so that you know
+   * the new project length's starting ID
+   * @returns length of the _projects array
+   */
+  function getProjectArrayLength() {
+    return _projects.length
+  }
+
   return {
-    saveProjects,
+    saveProject,
     deleteProject,
-    getProject
+    getProject,
+    getProjectArrayLength
   }
 })();
 
 const projectDisplayControllerModule = (() => {
+  // Holds a list of projects
+  const projectContainer = document.querySelector(".project-container");  
 
   let rememberLastSelected;
 
@@ -60,10 +69,18 @@ const projectDisplayControllerModule = (() => {
     _currentProjectHighlighted = id;
   }
 
+  /**
+   * 
+   * @returns Status regarding if a view is highlighted
+   */
   function getIsHighlightedStatus() {
     return _isHighlighted;
   }
 
+  /**
+   * 
+   * @param {*} status Boolean value to know if the status should be highlighted
+   */
   function setIsHighlightedStatus(status) {
     _isHighlighted = status;
   } 
@@ -136,21 +153,8 @@ const projectDisplayControllerModule = (() => {
       // Select the project you just clicked
       _selectProject(newProject, projectId);
 
-      // Get the list of tasks of that project
-      let tasksToLoad = allProjectsModule.getProject(projectId)
-
       // Clear the screen of the previous tasks
       taskDisplayModule.clearTaskScreen();
-
-      // Only load values when there are values to load
-      if(tasksToLoad) {
-        // Load the objects with the contents of the old tasks
-        for(task in tasksToLoad.tasks) {
-          let loadedTask = new Task(task.id, task.taskName);
-          loadedTask.init();
-          console.log(`Task ${tasksToLoad} loaded`);
-        }
-      }
     
       console.log(`Project ${projectId} clicked`)
     }))
@@ -187,7 +191,7 @@ class Project {
   project = {};
 
   // The static property
-  static #lastCount = 0;
+  static #lastCount = allProjectsModule.getProjectArrayLength();
 
   // The instance property using the class fields proposal syntax
   // Note I didn't initialize it with 1, that's a bit misleading.
@@ -203,9 +207,20 @@ class Project {
 
   init() {
     projectDisplayControllerModule.createProjectView(this.project.id);
+    console.log(`The project has an ID of ${this.project.id}`);
   }
-
 }
+
+/**
+ * Only for debugging
+ */
+function testProject() {
+  let test = new Project;
+  test.init();
+  allProjectsModule.saveProject(test);
+}
+
+testProject()
 
 export {
   allProjectsModule,
