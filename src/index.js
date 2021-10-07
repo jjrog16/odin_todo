@@ -4,10 +4,6 @@ import { Task, taskDisplayModule } from "./tasks";
 
 const projectContainer = document.querySelector(".project-container");
 
-// Load Projects and Tasks to the main view
-const loadProjectsTasksModule = (() => {
-
-})();
 
 // Creates listeners for the buttons on the main page
 const btnListenersModule = (() => {
@@ -46,5 +42,4 @@ const btnListenersModule = (() => {
   }
 })();
 
-loadProjectsTasksModule
 btnListenersModule

@@ -13,6 +13,36 @@ const allProjectsModule = (() => {
     return projectRetrieved
   }
 
+
+  /**
+   * Get index of the project in the array for upsert
+   * @param {*} id ID of the project to find the index of 
+   * @returns array index location of the project
+   */
+  function getProjectIdIndex(id) {
+    let projectRetrievedIndexLocation = _projects.findIndex(project => project.id == id);
+    return projectRetrievedIndexLocation;
+  }
+
+  /**
+   * 
+   * @param {*} projectIndex Index inside array of where the project resides
+   * @param {*} taskIndex Index inside array of where the task resides
+   * @param {*} value Value being updated
+   */
+  function upsert(projectIndex, taskIndex, value) {
+
+    // If task ID and value are null, it's because we are adding a new task to the project, and the value is the Task
+    if(taskIndex == null) {
+      _projects[projectIndex].projectTasks.push(value);
+      console.log(`Upsert: Taskname -> ${JSON.stringify(_projects[projectIndex].projectTasks[taskIndex])}`)
+    } else {
+      _projects[projectIndex].projectTasks[taskIndex].taskName = value;
+    }
+    console.log(`TaskIndex: ${taskIndex}`)
+    console.log(`Project array: ${JSON.stringify(_projects)}`);
+  }
+
   /**
    * Adds project object to project array
    * @param {*} projectToSave Project being saved to allProjectsModule
@@ -42,7 +72,9 @@ const allProjectsModule = (() => {
     saveProject,
     deleteProject,
     getProject,
-    getProjectArrayLength
+    getProjectArrayLength,
+    getProjectIdIndex,
+    upsert
   }
 })();
 
@@ -56,6 +88,83 @@ const projectDisplayControllerModule = (() => {
   // one that the user wants to view
   let _currentProjectHighlighted = 0;
   let _isHighlighted = false;
+
+  /**
+   * Highlights the project in the project sidebar and deselects other projects.
+   * @param {*} project The project being selected
+   */
+   function _selectProject(project, projectId) {
+
+    // Check to see if the value has been assigned yet. if not, then immediately assign.
+    if(getCurrentProjectHighlighted() == 0) {
+      setCurrentProjectHighlighted(projectId);
+      setIsHighlightedStatus(false);
+    }
+    
+    // I am selecting a different item than what is currently highlighted
+    if(getCurrentProjectHighlighted != projectId) {
+
+      let previouslySelected = document.getElementById(`project${getCurrentProjectHighlighted()}`);
+
+      // Check to see if you have a property. If you do then change it
+      if(previouslySelected != null) {
+        previouslySelected.style.backgroundColor = "black";
+        previouslySelected.style.color = "white";
+        rememberLastSelected = previouslySelected ;
+      }
+      
+    }
+
+    setCurrentProjectHighlighted(projectId);
+    project.style.backgroundColor = "white";
+    project.style.color = "black";
+    setIsHighlightedStatus(true);
+
+    // Since this project is highlighted, begin loading the tasks view for that project
+    loadProjectTasks(projectId);
+  }
+
+  /**
+   * Deletes project from allProjectModule and removes it from the UI
+   * @param {*} id 
+   */
+   function _deleteProject(id) {
+
+    console.log(`Status before delete -> ${getIsHighlightedStatus()}`)
+
+    // Remove the project from all projects
+    allProjectsModule.deleteProject(id);
+
+    // Remove project from the view
+    document.getElementById(`project${id}`).remove();
+
+    setIsHighlightedStatus(false);
+
+    console.log(`Status after delete -> ${getIsHighlightedStatus()}`);
+
+  }
+
+  /**
+   * Load the tasks of a highlighted project
+   * @param {*} id The ID of the project of which its tasks will be loaded to the Task View
+   */
+  function loadProjectTasks(id) {
+    // Set the task view so that it is cleared and ready to showcase tasks
+    taskDisplayModule.clearTaskScreen();
+    taskDisplayModule.initRemovableTaskContainer();
+
+    let retrievedProject = allProjectsModule.getProject(id);
+    console.log(`Loading Project Tasks. Here is your project -> ${JSON.stringify(retrievedProject)}`)
+    if(retrievedProject.projectTasks != null) {
+
+      // Get every task associated with a project
+      for(let i = 0; i < retrievedProject.projectTasks.length; i++) {
+        taskDisplayModule.createTaskView(retrievedProject.projectTasks[i]);
+      }
+    }
+    
+
+  }
 
   function getCurrentProjectHighlighted() {
     return _currentProjectHighlighted;
@@ -86,58 +195,6 @@ const projectDisplayControllerModule = (() => {
   } 
 
   /**
-   * Highlights the project in the project sidebar and deselects other projects.
-   * @param {*} project The project being selected
-   */
-  function _selectProject(project, projectId) {
-
-    // Check to see if the value has been assigned yet. if not, then immediately assign.
-    if(getCurrentProjectHighlighted() == 0) {
-      setCurrentProjectHighlighted(projectId);
-      setIsHighlightedStatus(false);
-    }
-    
-    // I am selecting a different item than what is currently highlighted
-    if(allProjectsModule.getCurrentProjectHighlighted != projectId) {
-
-      let previouslySelected = document.getElementById(`project${getCurrentProjectHighlighted()}`);
-
-      // Check to see if you have a property. If you do then change it
-      if(previouslySelected != null) {
-        previouslySelected.style.backgroundColor = "black";
-        previouslySelected.style.color = "white";
-        rememberLastSelected = previouslySelected ;
-      }
-      
-    }
-
-    setCurrentProjectHighlighted(projectId);
-    project.style.backgroundColor = "white";
-    project.style.color = "black";
-    setIsHighlightedStatus(true);
-  }
-
-  /**
-   * Deletes project from allProjectModule and removes it from the UI
-   * @param {*} id 
-   */
-  function _deleteProject(id) {
-
-    console.log(`Status before delete -> ${getIsHighlightedStatus()}`)
-
-    // Remove the project from all projects
-    allProjectsModule.deleteProject(id);
-
-    // Remove project from the view
-    document.getElementById(`project${id}`).remove();
-
-    setIsHighlightedStatus(false);
-
-    console.log(`Status after delete -> ${getIsHighlightedStatus()}`);
-
-  }
-
-  /**
    * Creates an individual entry for a Project
    */
   function createProjectView(projectId) {
@@ -152,11 +209,8 @@ const projectDisplayControllerModule = (() => {
     newProject.addEventListener("click", (() => {
       // Select the project you just clicked
       _selectProject(newProject, projectId);
-
-      // Clear the screen of the previous tasks
-      taskDisplayModule.clearTaskScreen();
-    
-      console.log(`Project ${projectId} clicked`)
+      console.log(`Project ${projectId} clicked`);
+      console.log(`${JSON.stringify(allProjectsModule.getProject(projectId))}`);
     }))
     
     newProject.appendChild(projectName);
@@ -188,7 +242,6 @@ const projectDisplayControllerModule = (() => {
 })();
 
 class Project {
-  project = {};
 
   // The static property
   static #lastCount = allProjectsModule.getProjectArrayLength();
@@ -201,13 +254,14 @@ class Project {
     // Increment and assign
     this.projectCounter = ++Project.#lastCount;
 
-    this.project.id = this.projectCounter;
-    this.project.name = `Project ${this.projectCounter}`;
+    this.id = this.projectCounter;
+    this.projectName = `Project ${this.projectCounter}`;
+    this.projectTasks = [];
   }
 
   init() {
-    projectDisplayControllerModule.createProjectView(this.project.id);
-    console.log(`The project has an ID of ${this.project.id}`);
+    projectDisplayControllerModule.createProjectView(this.id);
+    console.log(`The project has an ID of ${this.id}`);
   }
 }
 
@@ -215,9 +269,12 @@ class Project {
  * Only for debugging
  */
 function testProject() {
+
   let test = new Project;
   test.init();
   allProjectsModule.saveProject(test);
+
+
 }
 
 testProject()
