@@ -6,38 +6,22 @@ const projectContainer = document.querySelector(".project-container");
 const allProjectsModule = (() => {
   let _projects = [];
 
-  // TODO: Debug where values are being saved for tasks
-  let testTask = {
-    id: 1,
-    taskName: "Bother Jess"
+  /**
+   * Get the project from the _projects array
+   * @param {*} id ID of the project to be retrieved
+   * @returns {Project} 
+   */
+  function getProject(id) {
+    let projectRetrieved = _projects.find(project => project.id == id);
+    return projectRetrieved
   }
-
-  let testProject = {
-    id: 69,
-    projectName: "Project 69",
-    tasks: [testTask]
-  }
-
-  _projects.push(testProject)
-
-  // Project highlighted in the main console and the
-  // one that the user wants to view
-  let _currentProjectHighlighted = 0;
-  let _isHighlighted = false;
 
   /**
    * Adds project object to project array
-   * @param {*} id Project id of new project
-   * @param {*} name Name of the project
+   * @param {*} projectToSave Project being saved to allProjectsModule
    */
-  function addProjects(id, name) {
-    const newProject = {
-      id : id,
-      projectName : name,
-      tasks : []
-    }
-
-    _projects.push(newProject);
+  function saveProjects(projectToSave) {
+    _projects.push(projectToSave);
   }
 
   /**
@@ -48,10 +32,21 @@ const allProjectsModule = (() => {
     _projects.splice(id, 1);
   }
 
-  function getProject(id) {
-    let projectRetrieved = _projects.find(project => project.id == id);
-    return projectRetrieved
+  return {
+    saveProjects,
+    deleteProject,
+    getProject
   }
+})();
+
+const projectDisplayControllerModule = (() => {
+
+  let rememberLastSelected;
+
+  // Project highlighted in the main console and the
+  // one that the user wants to view
+  let _currentProjectHighlighted = 0;
+  let _isHighlighted = false;
 
   function getCurrentProjectHighlighted() {
     return _currentProjectHighlighted;
@@ -71,22 +66,7 @@ const allProjectsModule = (() => {
 
   function setIsHighlightedStatus(status) {
     _isHighlighted = status;
-  }
-
-  return {
-    addProjects,
-    deleteProject,
-    setCurrentProjectHighlighted,
-    getCurrentProjectHighlighted,
-    getIsHighlightedStatus,
-    setIsHighlightedStatus,
-    getProject
-  }
-})();
-
-const projectDisplayControllerModule = (() => {
-
-  let rememberLastSelected;
+  } 
 
   /**
    * Highlights the project in the project sidebar and deselects other projects.
@@ -95,15 +75,15 @@ const projectDisplayControllerModule = (() => {
   function _selectProject(project, projectId) {
 
     // Check to see if the value has been assigned yet. if not, then immediately assign.
-    if(allProjectsModule.getCurrentProjectHighlighted() == 0) {
-      allProjectsModule.setCurrentProjectHighlighted(projectId);
-      allProjectsModule.setIsHighlightedStatus(false);
+    if(getCurrentProjectHighlighted() == 0) {
+      setCurrentProjectHighlighted(projectId);
+      setIsHighlightedStatus(false);
     }
     
     // I am selecting a different item than what is currently highlighted
     if(allProjectsModule.getCurrentProjectHighlighted != projectId) {
 
-      let previouslySelected = document.getElementById(`project${allProjectsModule.getCurrentProjectHighlighted()}`);
+      let previouslySelected = document.getElementById(`project${getCurrentProjectHighlighted()}`);
 
       // Check to see if you have a property. If you do then change it
       if(previouslySelected != null) {
@@ -114,10 +94,10 @@ const projectDisplayControllerModule = (() => {
       
     }
 
-    allProjectsModule.setCurrentProjectHighlighted(projectId);
+    setCurrentProjectHighlighted(projectId);
     project.style.backgroundColor = "white";
     project.style.color = "black";
-    allProjectsModule.setIsHighlightedStatus(true);
+    setIsHighlightedStatus(true);
   }
 
   /**
@@ -126,7 +106,7 @@ const projectDisplayControllerModule = (() => {
    */
   function _deleteProject(id) {
 
-    console.log(`Status before delete -> ${allProjectsModule.getIsHighlightedStatus()}`)
+    console.log(`Status before delete -> ${getIsHighlightedStatus()}`)
 
     // Remove the project from all projects
     allProjectsModule.deleteProject(id);
@@ -134,9 +114,9 @@ const projectDisplayControllerModule = (() => {
     // Remove project from the view
     document.getElementById(`project${id}`).remove();
 
-    allProjectsModule.setIsHighlightedStatus(false);
+    setIsHighlightedStatus(false);
 
-    console.log(`Status after delete -> ${allProjectsModule.getIsHighlightedStatus()}`);
+    console.log(`Status after delete -> ${getIsHighlightedStatus()}`);
 
   }
 
@@ -162,14 +142,16 @@ const projectDisplayControllerModule = (() => {
       // Clear the screen of the previous tasks
       taskDisplayModule.clearTaskScreen();
 
-      // Load the objects with the contents of the old tasks
-      for(task in tasksToLoad.tasks) {
-        let loadedTask = new Task(task.id, task.taskName);
-        loadedTask.init();
-        console.log(`Task ${tasksToLoad} loaded`);
+      // Only load values when there are values to load
+      if(tasksToLoad) {
+        // Load the objects with the contents of the old tasks
+        for(task in tasksToLoad.tasks) {
+          let loadedTask = new Task(task.id, task.taskName);
+          loadedTask.init();
+          console.log(`Task ${tasksToLoad} loaded`);
+        }
       }
-      
-      
+    
       console.log(`Project ${projectId} clicked`)
     }))
     
@@ -190,18 +172,13 @@ const projectDisplayControllerModule = (() => {
     projectContainer.appendChild(newProject);
   }
   
-  /**
-   * Saves the project to the allProjectsModule so all projects are stored
-   * @param {*} id ID of the project made
-   * @param {*} name Name of the project
-   */
-  function saveProject(id, name) {
-    allProjectsModule.addProjects(id, name);
-  }
   
   return {
     createProjectView,
-    saveProject
+    setCurrentProjectHighlighted,
+    getCurrentProjectHighlighted,
+    getIsHighlightedStatus,
+    setIsHighlightedStatus,
   }
 
 })();
@@ -226,12 +203,12 @@ class Project {
 
   init() {
     projectDisplayControllerModule.createProjectView(this.project.id);
-    projectDisplayControllerModule.saveProject(this.project.id, this.project.name);
   }
 
 }
 
 export {
-  Project,
-  allProjectsModule
+  allProjectsModule,
+  projectDisplayControllerModule,
+  Project
 }

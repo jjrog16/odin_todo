@@ -1,5 +1,3 @@
-import { Project, allProjectsModule } from "./projects";
-
 const taskContainer = document.querySelector(".task-container");
 
 let removableTaskContainer;
