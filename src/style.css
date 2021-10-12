@@ -46,8 +46,8 @@ body {
 }
 
 .delete-project:hover {
-  background-color: white;
-  color: black;
+  background-color: red;
+  color: white;
   cursor: pointer;
 }
 
