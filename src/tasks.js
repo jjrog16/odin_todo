@@ -1,6 +1,6 @@
 import { allProjectsModule, projectDisplayControllerModule } from "./projects";
 
-const taskDisplayModule = (() =>{ 
+const taskDisplayModule = (() => {
   const taskContainer = document.querySelector(".task-container");
 
   /**
@@ -11,9 +11,9 @@ const taskDisplayModule = (() =>{
     removableTaskContainer.setAttribute("class", "removable");
     taskContainer.appendChild(removableTaskContainer);
   }
-  
+
   function createTaskView(task) {
-    console.log(`Task created -> ${JSON.stringify(task)}`)
+    console.log(`Task created -> ${JSON.stringify(task)}`);
     console.log(`Task id: ${task.id}`);
 
     // Create individual item
@@ -61,7 +61,8 @@ const taskDisplayModule = (() =>{
     btnDeleteTask.setAttribute("class", "delete-task");
     btnDeleteTask.appendChild(document.createTextNode("Delete"));
     btnDeleteTask.addEventListener("click", () => {
-      let currentlySelectedProjectId = projectDisplayControllerModule.getCurrentProjectHighlighted();
+      let currentlySelectedProjectId =
+        projectDisplayControllerModule.getCurrentProjectHighlighted();
       deleteTaskFromUI(currentlySelectedProjectId, task.id);
     });
 
@@ -78,7 +79,7 @@ const taskDisplayModule = (() =>{
     divTaskContents.appendChild(divTaskLeft);
     divTaskContents.appendChild(divTaskHolder);
 
-    // Redefining in this scope as a view already existing. 
+    // Redefining in this scope as a view already existing.
     let removableTaskContainer = document.querySelector(".removable");
     removableTaskContainer.appendChild(divTaskContents);
     taskContainer.appendChild(removableTaskContainer);
@@ -100,7 +101,8 @@ const taskDisplayModule = (() =>{
    */
   function saveTaskView(task) {
     // Save the task to the project
-    let projectId = projectDisplayControllerModule.getCurrentProjectHighlighted();
+    let projectId =
+      projectDisplayControllerModule.getCurrentProjectHighlighted();
     let projectIdIndex = allProjectsModule.getProjectIdIndex(projectId);
     allProjectsModule.upsert(projectIdIndex, null, task);
   }
@@ -110,19 +112,21 @@ const taskDisplayModule = (() =>{
    */
   function clearTaskScreen() {
     let removable = document.querySelector(".removable");
-    if(removable) {
+    if (removable) {
       removable.remove();
     }
   }
 
   /**
    * Get index of the project in the array for upsert
-   * @param {*} id ID of the project to find the index of 
+   * @param {*} id ID of the project to find the index of
    * @param {*} project Project currently in view of which you are retrieving the tasks
    * @returns array index location of the project
    */
-   function getTaskIdIndex(id, project) {
-    let taskRetrievedIndexLocation = project.projectTasks.findIndex(task => task.id == id);
+  function getTaskIdIndex(id, project) {
+    let taskRetrievedIndexLocation = project.projectTasks.findIndex(
+      (task) => task.id == id
+    );
     return taskRetrievedIndexLocation;
   }
 
@@ -135,7 +139,8 @@ const taskDisplayModule = (() =>{
     let updatedTaskName = e.target.value;
 
     // Get the id of the project highlighted in view
-    let myProjectId = projectDisplayControllerModule.getCurrentProjectHighlighted();
+    let myProjectId =
+      projectDisplayControllerModule.getCurrentProjectHighlighted();
     console.log(`myProjectId: ${myProjectId}`);
 
     // Get the index of the project
@@ -143,11 +148,18 @@ const taskDisplayModule = (() =>{
     console.log(`locationOfProject: ${locationOfProject}`);
 
     // Get the index of the particular task in its index
-    let locationOfTask = getTaskIdIndex(taskId, allProjectsModule.getProject(myProjectId));
+    let locationOfTask = getTaskIdIndex(
+      taskId,
+      allProjectsModule.getProject(myProjectId)
+    );
     console.log(`locationOfTask: ${locationOfTask}`);
 
-    allProjectsModule.upsert(locationOfProject, locationOfTask, updatedTaskName);
-    
+    allProjectsModule.upsert(
+      locationOfProject,
+      locationOfTask,
+      updatedTaskName
+    );
+
     console.log(`${allProjectsModule.getProject(myProjectId)}`);
   }
 
@@ -156,14 +168,11 @@ const taskDisplayModule = (() =>{
     clearTaskScreen,
     initRemovableTaskContainer,
     getTaskIdIndex,
-    saveTaskView
-  }
-
-
+    saveTaskView,
+  };
 })();
 
 class Task {
-
   // The static property
   static #lastCount = 0;
 
@@ -182,10 +191,6 @@ class Task {
     taskDisplayModule.createTaskView(this);
     taskDisplayModule.saveTaskView(this);
   }
-
 }
 
-export {
-  Task,
-  taskDisplayModule
-}
+export { Task, taskDisplayModule };

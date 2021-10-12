@@ -61,7 +61,6 @@ body {
   justify-content: space-between;
 }
 
-
 .section-title {
   font-size: 48px;
 }
@@ -70,7 +69,6 @@ body {
   color: white;
   padding: 0px 8px 32px 8px;
 }
-
 
 /* Tasks */
 .main-container {
@@ -92,12 +90,11 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-
 }
 
 .task-contents {
   border: 1px solid #eee;
-  box-shadow: 2px 4px 16px rgba(0,0,0,.06);
+  box-shadow: 2px 4px 16px rgba(0, 0, 0, 0.06);
   border-radius: 4px;
   width: 400px;
   display: flex;

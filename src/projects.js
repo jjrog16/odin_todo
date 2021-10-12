@@ -13,24 +13,29 @@ const allProjectsModule = (() => {
    * @returns {Project} Project object
    */
   function getProject(id) {
-    let projectRetrieved = _projects.find(project => project.id == id);
+    let projectRetrieved = _projects.find((project) => project.id == id);
     return projectRetrieved;
   }
 
-
   /**
    * Get index of the project in the array for upsert
-   * @param {*} id ID of the project to find the index of 
+   * @param {*} id ID of the project to find the index of
    * @returns array index location of the project
    */
   function getProjectIdIndex(id) {
-    let projectRetrievedIndexLocation = _projects.findIndex(project => project.id == id);
+    let projectRetrievedIndexLocation = _projects.findIndex(
+      (project) => project.id == id
+    );
     return projectRetrievedIndexLocation;
   }
 
   function getTaskIdIndexFromProject(taskId) {
-    let projectIdIndex = getProjectIdIndex(projectDisplayControllerModule.getCurrentProjectHighlighted());
-    let taskRetrievedIndexLocation = _projects[projectIdIndex].projectTasks.findIndex(task => task.id == taskId);
+    let projectIdIndex = getProjectIdIndex(
+      projectDisplayControllerModule.getCurrentProjectHighlighted()
+    );
+    let taskRetrievedIndexLocation = _projects[
+      projectIdIndex
+    ].projectTasks.findIndex((task) => task.id == taskId);
     return taskRetrievedIndexLocation;
   }
 
@@ -41,9 +46,8 @@ const allProjectsModule = (() => {
    * @param {*} value Value being updated
    */
   function upsert(projectIndex, taskIndex, value) {
-
     // If task ID and value are null, it's because we are adding a new task to the project, and the value is the Task
-    if(taskIndex == null) {
+    if (taskIndex == null) {
       _projects[projectIndex].projectTasks.push(value);
     } else {
       _projects[projectIndex].projectTasks[taskIndex].taskName = value;
@@ -76,14 +80,14 @@ const allProjectsModule = (() => {
   }
 
   /**
-   * 
+   *
    * @param {*} projectId ID of the project selected
    * @param {*} taskId ID of the task to be deleted
    */
   function deleteTaskInProject(projectId, taskId) {
     let projectIdIndex = getProjectIdIndex(projectId);
     let taskIdIndex = getTaskIdIndexFromProject(taskId);
-    _projects[projectIdIndex].projectTasks.splice(taskIdIndex,1);
+    _projects[projectIdIndex].projectTasks.splice(taskIdIndex, 1);
   }
 
   /**
@@ -92,7 +96,7 @@ const allProjectsModule = (() => {
    * @returns length of the _projects array
    */
   function getProjectArrayLength() {
-    return _projects.length
+    return _projects.length;
   }
 
   return {
@@ -103,14 +107,13 @@ const allProjectsModule = (() => {
     getProjectIdIndex,
     upsert,
     deleteTaskInProject,
-    updateProjectName
-  }
-
+    updateProjectName,
+  };
 })();
 
 const projectDisplayControllerModule = (() => {
   // Holds a list of projects
-  const projectContainer = document.querySelector(".project-container");  
+  const projectContainer = document.querySelector(".project-container");
 
   let rememberLastSelected;
 
@@ -123,26 +126,25 @@ const projectDisplayControllerModule = (() => {
    * Highlights the project in the project sidebar and deselects other projects.
    * @param {*} project The project being selected
    */
-   function _selectProject(project, projectId) {
-
+  function _selectProject(project, projectId) {
     // Check to see if the value has been assigned yet. if not, then immediately assign.
-    if(getCurrentProjectHighlighted() == 0) {
+    if (getCurrentProjectHighlighted() == 0) {
       setCurrentProjectHighlighted(projectId);
       setIsHighlightedStatus(false);
     }
-    
-    // I am selecting a different item than what is currently highlighted
-    if(getCurrentProjectHighlighted != projectId) {
 
-      let previouslySelected = document.getElementById(`project${getCurrentProjectHighlighted()}`);
+    // I am selecting a different item than what is currently highlighted
+    if (getCurrentProjectHighlighted != projectId) {
+      let previouslySelected = document.getElementById(
+        `project${getCurrentProjectHighlighted()}`
+      );
 
       // Check to see if you have a property. If you do then change it
-      if(previouslySelected != null) {
+      if (previouslySelected != null) {
         previouslySelected.style.backgroundColor = "black";
         previouslySelected.style.color = "white";
-        rememberLastSelected = previouslySelected ;
+        rememberLastSelected = previouslySelected;
       }
-      
     }
 
     setCurrentProjectHighlighted(projectId);
@@ -156,11 +158,10 @@ const projectDisplayControllerModule = (() => {
 
   /**
    * Deletes project from allProjectModule and removes it from the UI
-   * @param {*} id 
+   * @param {*} id
    */
-   function _deleteProjectFromUI(id) {
-
-    console.log(`Status before delete -> ${getIsHighlightedStatus()}`)
+  function _deleteProjectFromUI(id) {
+    console.log(`Status before delete -> ${getIsHighlightedStatus()}`);
 
     // Remove the project from all projects
     allProjectsModule.deleteProject(id);
@@ -171,7 +172,6 @@ const projectDisplayControllerModule = (() => {
     setIsHighlightedStatus(false);
 
     console.log(`Status after delete -> ${getIsHighlightedStatus()}`);
-
   }
 
   /**
@@ -184,18 +184,21 @@ const projectDisplayControllerModule = (() => {
     taskDisplayModule.initRemovableTaskContainer();
 
     let retrievedProject = allProjectsModule.getProject(id);
-    console.log(`Loading Project Tasks. Here is your project -> ${JSON.stringify(retrievedProject)}`)
-    if(retrievedProject.projectTasks != null) {
-
+    console.log(
+      `Loading Project Tasks. Here is your project -> ${JSON.stringify(
+        retrievedProject
+      )}`
+    );
+    if (retrievedProject.projectTasks != null) {
       // Get every task associated with a project
-      for(let i = 0; i < retrievedProject.projectTasks.length; i++) {
+      for (let i = 0; i < retrievedProject.projectTasks.length; i++) {
         taskDisplayModule.createTaskView(retrievedProject.projectTasks[i]);
       }
     }
   }
 
   /**
-   * 
+   *
    * @returns The project ID of the highlighted project
    */
   function getCurrentProjectHighlighted() {
@@ -211,7 +214,7 @@ const projectDisplayControllerModule = (() => {
   }
 
   /**
-   * 
+   *
    * @returns Status regarding if a view is highlighted
    */
   function getIsHighlightedStatus() {
@@ -219,12 +222,12 @@ const projectDisplayControllerModule = (() => {
   }
 
   /**
-   * 
+   *
    * @param {*} status Boolean value to know if the status should be highlighted
    */
   function setIsHighlightedStatus(status) {
     _isHighlighted = status;
-  } 
+  }
 
   /**
    * Creates an individual entry for a Project
@@ -239,27 +242,27 @@ const projectDisplayControllerModule = (() => {
 
     // Name of each project being added to the list
     projectName.setAttribute("value", `Project ${projectId}`);
-    
-    // Change name of the project once the user is done entering text
-    projectName.addEventListener("change",(event) => {
-      updateProjectNameFromView(event);
-    })
 
-    newProject.addEventListener("click", (() => {
+    // Change name of the project once the user is done entering text
+    projectName.addEventListener("change", (event) => {
+      updateProjectNameFromView(event);
+    });
+
+    newProject.addEventListener("click", () => {
       // Select the project you just clicked
       _selectProject(newProject, projectId);
       console.log(`Project ${projectId} clicked`);
       console.log(`${JSON.stringify(allProjectsModule.getProject(projectId))}`);
-    }))
-        
+    });
+
     // Button to delete project
     let btnDeleteProject = document.createElement("div");
     btnDeleteProject.setAttribute("class", "delete-project");
     btnDeleteProject.appendChild(document.createTextNode("x"));
 
-    btnDeleteProject.addEventListener("click", (() => {
-        _deleteProjectFromUI(projectId);
-    }));
+    btnDeleteProject.addEventListener("click", () => {
+      _deleteProjectFromUI(projectId);
+    });
 
     newProject.appendChild(projectName);
     newProject.appendChild(btnDeleteProject);
@@ -267,7 +270,6 @@ const projectDisplayControllerModule = (() => {
     // Set the content
     projectContainer.appendChild(newProject);
   }
-
 
   /**
    * Takes an event change from the UI and saves the name
@@ -280,20 +282,17 @@ const projectDisplayControllerModule = (() => {
     let locationOfProject = allProjectsModule.getProjectIdIndex(myProjectId);
     allProjectsModule.updateProjectName(locationOfProject, updatedProjectName);
   }
-  
-  
+
   return {
     createProjectView,
     setCurrentProjectHighlighted,
     getCurrentProjectHighlighted,
     getIsHighlightedStatus,
     setIsHighlightedStatus,
-  }
-
+  };
 })();
 
 class Project {
-
   // The static property
   static #lastCount = allProjectsModule.getProjectArrayLength();
 
@@ -320,18 +319,11 @@ class Project {
  * Only for debugging
  */
 function testProject() {
-
-  let test = new Project;
+  let test = new Project();
   test.init();
   allProjectsModule.saveProject(test);
-
-
 }
 
-testProject()
+testProject();
 
-export {
-  allProjectsModule,
-  projectDisplayControllerModule,
-  Project
-}
+export { allProjectsModule, projectDisplayControllerModule, Project };
