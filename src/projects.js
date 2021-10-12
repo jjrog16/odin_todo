@@ -51,6 +51,15 @@ const allProjectsModule = (() => {
   }
 
   /**
+   * Updates the name of a project
+   * @param {*} index Location of the project to update
+   * @param {*} value The value of the name to update
+   */
+  function updateProjectName(index, value) {
+    _projects[index].projectName = value;
+  }
+
+  /**
    * Adds project object to project array
    * @param {*} projectToSave Project being saved to allProjectsModule
    */
@@ -93,7 +102,8 @@ const allProjectsModule = (() => {
     getProjectArrayLength,
     getProjectIdIndex,
     upsert,
-    deleteTaskInProject
+    deleteTaskInProject,
+    updateProjectName
   }
 
 })();
@@ -221,13 +231,18 @@ const projectDisplayControllerModule = (() => {
    */
   function createProjectView(projectId) {
     // Create individual projects
-    let newProject = document.createElement("div");
+    let newProject = document.createElement("input");
     newProject.setAttribute("class", "project-item");
     newProject.setAttribute("id", `project${projectId}`);
 
     // Name of each project being added to the list
-    let projectName = document.createTextNode(`Project ${projectId}`);
+    newProject.setAttribute("value", `Project ${projectId}`);
     
+    // Change name of the project once the user is done entering text
+    newProject.addEventListener("change",(event) => {
+      updateProjectNameFromView(event);
+    })
+
     newProject.addEventListener("click", (() => {
       // Select the project you just clicked
       _selectProject(newProject, projectId);
@@ -235,8 +250,8 @@ const projectDisplayControllerModule = (() => {
       console.log(`${JSON.stringify(allProjectsModule.getProject(projectId))}`);
     }))
     
-    newProject.appendChild(projectName);
-
+    //newProject.appendChild(projectName);
+    
     // Button to delete project
     let btnDeleteProject = document.createElement("div");
     btnDeleteProject.setAttribute("class", "delete-project");
@@ -250,6 +265,19 @@ const projectDisplayControllerModule = (() => {
 
     // Set the content
     projectContainer.appendChild(newProject);
+  }
+
+
+  /**
+   * Takes an event change from the UI and saves the name
+   * @param {*} e User Event change (from unclicking or clicking something else)
+   */
+  function updateProjectNameFromView(e) {
+    let updatedProjectName = e.target.value;
+
+    let myProjectId = getCurrentProjectHighlighted();
+    let locationOfProject = allProjectsModule.getProjectIdIndex(myProjectId);
+    allProjectsModule.updateProjectName(locationOfProject, updatedProjectName);
   }
   
   
