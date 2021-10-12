@@ -127,3 +127,14 @@ body {
 .task-holder {
   width: 400px;
 }
+
+.delete-task {
+  height: 32x;
+  text-align: center;
+  padding: 8px;
+}
+.delete-task:hover {
+  background-color: red;
+  color: white;
+  cursor: pointer;
+}
