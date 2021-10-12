@@ -1,16 +1,20 @@
 import { taskDisplayModule } from "./tasks";
 
+/**
+ * Module pertaining to managing all Projects
+ */
 const allProjectsModule = (() => {
+  // Holds all Project objects
   let _projects = [];
 
   /**
    * Get the project from the _projects array
    * @param {*} id ID of the project to be retrieved
-   * @returns {Project} 
+   * @returns {Project} Project object
    */
   function getProject(id) {
     let projectRetrieved = _projects.find(project => project.id == id);
-    return projectRetrieved
+    return projectRetrieved;
   }
 
 
@@ -24,10 +28,16 @@ const allProjectsModule = (() => {
     return projectRetrievedIndexLocation;
   }
 
+  function getTaskIdIndexFromProject(taskId) {
+    let projectIdIndex = getProjectIdIndex(projectDisplayControllerModule.getCurrentProjectHighlighted());
+    let taskRetrievedIndexLocation = _projects[projectIdIndex].projectTasks.findIndex(task => task.id == taskId);
+    return taskRetrievedIndexLocation;
+  }
+
   /**
-   * 
-   * @param {*} projectIndex Index inside array of where the project resides
-   * @param {*} taskIndex Index inside array of where the task resides
+   * Update or insert Tasks inside Projects
+   * @param {*} projectIndex Index inside _projects array of where the project resides
+   * @param {*} taskIndex Index inside projectTasks array of where the task resides
    * @param {*} value Value being updated
    */
   function upsert(projectIndex, taskIndex, value) {
@@ -35,12 +45,9 @@ const allProjectsModule = (() => {
     // If task ID and value are null, it's because we are adding a new task to the project, and the value is the Task
     if(taskIndex == null) {
       _projects[projectIndex].projectTasks.push(value);
-      console.log(`Upsert: Taskname -> ${JSON.stringify(_projects[projectIndex].projectTasks[taskIndex])}`)
     } else {
       _projects[projectIndex].projectTasks[taskIndex].taskName = value;
     }
-    console.log(`TaskIndex: ${taskIndex}`)
-    console.log(`Project array: ${JSON.stringify(_projects)}`);
   }
 
   /**
@@ -60,8 +67,19 @@ const allProjectsModule = (() => {
   }
 
   /**
+   * 
+   * @param {*} projectId ID of the project selected
+   * @param {*} taskId ID of the task to be deleted
+   */
+  function deleteTaskInProject(projectId, taskId) {
+    let projectIdIndex = getProjectIdIndex(projectId);
+    let taskIdIndex = getTaskIdIndexFromProject(taskId);
+    _projects[projectIdIndex].projectTasks.splice(taskIdIndex,1);
+  }
+
+  /**
    * Get the number of how many projects exists so that you know
-   * the new project length's starting ID
+   * the new project's starting ID
    * @returns length of the _projects array
    */
   function getProjectArrayLength() {
@@ -74,8 +92,10 @@ const allProjectsModule = (() => {
     getProject,
     getProjectArrayLength,
     getProjectIdIndex,
-    upsert
+    upsert,
+    deleteTaskInProject
   }
+
 })();
 
 const projectDisplayControllerModule = (() => {
@@ -128,7 +148,7 @@ const projectDisplayControllerModule = (() => {
    * Deletes project from allProjectModule and removes it from the UI
    * @param {*} id 
    */
-   function _deleteProject(id) {
+   function _deleteProjectFromUI(id) {
 
     console.log(`Status before delete -> ${getIsHighlightedStatus()}`)
 
@@ -162,10 +182,12 @@ const projectDisplayControllerModule = (() => {
         taskDisplayModule.createTaskView(retrievedProject.projectTasks[i]);
       }
     }
-    
-
   }
 
+  /**
+   * 
+   * @returns The project ID of the highlighted project
+   */
   function getCurrentProjectHighlighted() {
     return _currentProjectHighlighted;
   }
@@ -221,7 +243,7 @@ const projectDisplayControllerModule = (() => {
     btnDeleteProject.appendChild(document.createTextNode("x"));
 
     btnDeleteProject.addEventListener("click", (() => {
-        _deleteProject(projectId);
+        _deleteProjectFromUI(projectId);
     }));
 
     newProject.appendChild(btnDeleteProject);
