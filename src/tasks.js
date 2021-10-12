@@ -32,6 +32,7 @@ const taskDisplayModule = (() =>{
     // Task contents
     let divTaskContents = document.createElement("div");
     divTaskContents.setAttribute("class", "task-contents");
+    divTaskContents.setAttribute("id", `task${task.id}`);
 
     // Task Holder
     let divTaskHolder = document.createElement("div");
@@ -44,17 +45,12 @@ const taskDisplayModule = (() =>{
     // Task name
     let inputTaskName = document.createElement("input");
     inputTaskName.setAttribute("class", "task-name");
-    inputTaskName.setAttribute("id", `task${task.id}`);
+    //inputTaskName.setAttribute("id", `task${task.id}`);
     inputTaskName.setAttribute("value", task.taskName);
     // Save the new edited name to its project
     inputTaskName.addEventListener("change", (event) => {
       updateTask(event, task.id);
     });
-
-    // // Task Date
-    // let divTaskDate = document.createElement("div");
-    // divTaskDate.setAttribute("class", "task-date");
-    // divTaskDate.appendChild(document.createTextNode(`${date.toLocaleDateString("en-US")}`));
 
     // Task bottom
     let divTaskBottom = document.createElement("div");
@@ -64,12 +60,15 @@ const taskDisplayModule = (() =>{
     let btnDeleteTask = document.createElement("div");
     btnDeleteTask.setAttribute("class", "delete-task");
     btnDeleteTask.appendChild(document.createTextNode("Delete"));
+    btnDeleteTask.addEventListener("click", () => {
+      let currentlySelectedProjectId = projectDisplayControllerModule.getCurrentProjectHighlighted();
+      deleteTaskFromUI(currentlySelectedProjectId, task.id);
+    });
 
     // Append to parents
     divTaskLeft.appendChild(btnCleared);
 
     divTaskTop.appendChild(inputTaskName);
-    // divTaskTop.appendChild(divTaskDate);
 
     divTaskBottom.appendChild(btnDeleteTask);
 
@@ -85,6 +84,20 @@ const taskDisplayModule = (() =>{
     taskContainer.appendChild(removableTaskContainer);
   }
 
+  /**
+   * Removes task from project array and deletes the view
+   * @param {*} projectId Project ID that is currently selected
+   * @param {*} taskId Current Task ID
+   */
+  function deleteTaskFromUI(projectId, taskId) {
+    allProjectsModule.deleteTaskInProject(projectId, taskId);
+    document.getElementById(`task${taskId}`).remove();
+  }
+
+  /**
+   * Saves the task to the project array
+   * @param {Task} Task the Task being saved
+   */
   function saveTaskView(task) {
     // Save the task to the project
     let projectId = projectDisplayControllerModule.getCurrentProjectHighlighted();
@@ -92,6 +105,9 @@ const taskDisplayModule = (() =>{
     allProjectsModule.upsert(projectIdIndex, null, task);
   }
 
+  /**
+   * Clears the contents of the task screen
+   */
   function clearTaskScreen() {
     let removable = document.querySelector(".removable");
     if(removable) {
