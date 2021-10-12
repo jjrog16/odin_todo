@@ -251,9 +251,7 @@ const projectDisplayControllerModule = (() => {
       console.log(`Project ${projectId} clicked`);
       console.log(`${JSON.stringify(allProjectsModule.getProject(projectId))}`);
     }))
-    
-    //newProject.appendChild(projectName);
-    
+        
     // Button to delete project
     let btnDeleteProject = document.createElement("div");
     btnDeleteProject.setAttribute("class", "delete-project");
