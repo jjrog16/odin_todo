@@ -174,7 +174,7 @@ class Task {
   constructor() {
     this.taskCounter = ++Task.#lastCount;
     this.id = this.taskCounter;
-    this.taskName = "hi";
+    this.taskName = "";
   }
 
   init() {

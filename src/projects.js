@@ -231,15 +231,17 @@ const projectDisplayControllerModule = (() => {
    */
   function createProjectView(projectId) {
     // Create individual projects
-    let newProject = document.createElement("input");
+    let newProject = document.createElement("div");
     newProject.setAttribute("class", "project-item");
     newProject.setAttribute("id", `project${projectId}`);
 
+    let projectName = document.createElement("input");
+
     // Name of each project being added to the list
-    newProject.setAttribute("value", `Project ${projectId}`);
+    projectName.setAttribute("value", `Project ${projectId}`);
     
     // Change name of the project once the user is done entering text
-    newProject.addEventListener("change",(event) => {
+    projectName.addEventListener("change",(event) => {
       updateProjectNameFromView(event);
     })
 
@@ -261,6 +263,7 @@ const projectDisplayControllerModule = (() => {
         _deleteProjectFromUI(projectId);
     }));
 
+    newProject.appendChild(projectName);
     newProject.appendChild(btnDeleteProject);
 
     // Set the content
